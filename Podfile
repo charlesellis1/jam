@@ -8,4 +8,9 @@ target 'JAM' do
   # Pods for JAM
 pod "SoundWave"
 pod "Firebase/Analytics"
+pod 'Firebase/Storage'
+pod 'Firebase/Database'
+pod 'Firebase/Firestore'
+pod 'Firebase/Auth'
+
 end

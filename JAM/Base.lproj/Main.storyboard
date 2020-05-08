@@ -635,17 +635,26 @@
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="46" translatesAutoresizingMaskIntoConstraints="NO" id="JQg-Qb-tj3" userLabel="Line Stack View">
                                 <rect key="frame" x="39" y="446" width="332" height="5"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DOA-Eg-1lb">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DOA-Eg-1lb">
                                         <rect key="frame" x="0.0" y="0.0" width="80" height="5"/>
                                         <color key="backgroundColor" red="0.85650705920000003" green="0.45098039220000002" blue="0.85882352939999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="80" id="fao-VF-nyZ"/>
+                                        </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jbF-ad-u2f">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jbF-ad-u2f">
                                         <rect key="frame" x="126" y="0.0" width="85" height="5"/>
                                         <color key="backgroundColor" red="0.85650705920000003" green="0.45098039220000002" blue="0.85882352939999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="85" id="qDs-mN-XIn"/>
+                                        </constraints>
                                     </view>
-                                    <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nky-E7-cUw">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nky-E7-cUw">
                                         <rect key="frame" x="257" y="0.0" width="75" height="5"/>
                                         <color key="backgroundColor" red="0.85650705920000003" green="0.45098039220000002" blue="0.85882352939999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="75" id="ARK-0K-Z9d"/>
+                                        </constraints>
                                     </view>
                                 </subviews>
                                 <constraints>
@@ -1211,7 +1220,6 @@
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="recordingLabel" destination="IAM-Im-3ya" id="B0v-Wf-MWy"/>
-                                            <segue destination="7YB-Nm-XaE" kind="unwind" identifier="unwind" unwindAction="unwindToRootViewController:" id="u3M-Ea-dWO"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1279,6 +1287,7 @@
                         <outlet property="buttonOutlet" destination="Jme-oX-Bbp" id="ApW-eh-epb"/>
                         <outlet property="recordingsTableView" destination="Dt6-CH-Uem" id="zFZ-JU-FBE"/>
                         <outlet property="timeLabel" destination="hmf-QH-BRU" id="rKU-t1-gBH"/>
+                        <segue destination="7YB-Nm-XaE" kind="unwind" identifier="finishedRecording" unwindAction="unwindToNewProjectViewWithSegue:" id="aGu-7j-iA0"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZA2-vA-xyX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

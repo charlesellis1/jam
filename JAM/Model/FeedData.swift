@@ -10,11 +10,14 @@ import Foundation
 import UIKit
 import AVFoundation
 import SoundWave
+import Firebase
+//import FirebaseFirestore
 
 var feed = FeedData()
 
 struct Post {
     var displayName: String
+    var username: String
     var profilePic: UIImage
     var caption: String
     var date: Date
@@ -32,9 +35,17 @@ class FeedData {
     
     var profilePic = UIImage(named: "default_avatar")
     
+    
+    //Firebase stuff
+    let db = Firestore.firestore()
+    
+    let storage = Storage.storage()
+    
+    
+    
     var posts: [Post] = [
-        Post(displayName: "Charlie Ellis", profilePic: UIImage(named: "default_avatar")!, caption: "Yoooo", date: Date(), audioFileName: "polar-bowler-3.mp3", waveform: nil),
-        Post(displayName: "Nikhil Yerasi", profilePic: UIImage(named: "default_avatar")!, caption: "In my feels 😷", date: Date(), audioFileName: "maria.mp3", waveform: nil)
+        Post(displayName: "Charlie Ellis", username: "@chellis11", profilePic: UIImage(named: "default_avatar")!, caption: "Yoooo", date: Date(), audioFileName: "polar-bowler-3.mp3", waveform: nil),
+        Post(displayName: "Nikhil Yerasi", username: "nyerasi", profilePic: UIImage(named: "default_avatar")!, caption: "In my feels 😷", date: Date(), audioFileName: "maria.mp3", waveform: nil)
     ]
     
     
@@ -151,6 +162,138 @@ class FeedData {
         }
         
     }
+    
+    
+    
+    ///FIREBASE IMPLEMENTATION
+    
+    
+    
+    func updatePostToFirestore(post: Post) {
+        let postID = UUID.init().uuidString
+        let dbDisplayName = post.displayName
+        let dbDate = post.date
+        let dbUser = post.username
+        let dbCaption = post.caption
+        
+    
+        
+        //firebase can play sound? or na ****
+        let dbSound = post.audioFileName
+        
+        
+        
+        //Storage reference
+        let storageRef = storage.reference(withPath: "posts/\(postID)/sound")
+        
+        
+        
+        
+        //Will this Work??? vvvv
+        let dbAudio = Bundle.main.path(forResource: dbSound, ofType: nil)
+        
+        let soundURL = URL(fileURLWithPath: dbAudio!)
+        
+//        var dbAudioPlayer: AVAudioPlayer?
+//
+//        do {
+//            dbAudioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: dbAudio!))
+//        }
+//        catch {
+//            print("Error playing sound or acquiring sound")
+//        }
+        
+        let uploadMetaData = StorageMetadata.init()
+        uploadMetaData.contentType = "audio"
+        storageRef.putFile(from: soundURL)
+        
+        
+        
+//        //From snapagram
+//        guard let postImageData = post.image?.jpegData(compressionQuality: 0.75) else { return }
+//        let uploadMetaData = StorageMetadata.init()
+//        uploadMetaData.contentType = "image/jpeg"
+//        storageRef.putData(postImageData)
+    
+        let dbProfilePic = post.profilePic.jpegData(compressionQuality: 0.75)
+    
+        
+        var ref: DocumentReference? = nil
+
+
+        ref = db.collection("posts").addDocument(data: [
+            "postID": postID,
+            "displayName": dbDisplayName,
+            "username": dbUser,
+            "profilePic": dbProfilePic,
+            "date": dbDate,
+            "caption": dbCaption,
+            "soundFileName": dbSound
+        ]) {err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            }
+            else {
+                print("Document added with ID: \(ref!.documentID)")
+            }
+        }
+    }
+
+
+    
+    func fetch() {
+        
+        db.collection("posts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            }
+            else {
+                
+                var postID: String
+                var displayName: String
+                var username: String
+                //this doesn't work
+                var profilePic: UIImage
+                var date: Date
+                var caption: String
+                var soundFileName: String
+                
+                for document in querySnapshot!.documents {
+                    postID = document.data()["postID"] as! String
+                    displayName = document.data()["displayName"] as! String
+                    username = document.data()["username"] as! String
+                    let profilePicData = document.data()["profilePic"] as! Data
+                    profilePic = UIImage(data: profilePicData) ?? UIImage(named: "default_avatar") as! UIImage
+                    caption = document.data()["caption"] as! String
+                    date = document.data()["date"] as! Date
+                    soundFileName = document.data()["soundFileName"] as! String
+                    
+                    
+                    
+                    let storageRef = self.storage.reference(withPath: "posts/\(postID)/sound")
+                    
+                    storageRef.getData(maxSize: 4 * 1024 * 1024) { (data, err) in
+                        if err != nil {
+                            print("Error in storage")
+                        }
+                        if let data = data {
+                            
+                            self.posts.append(Post(displayName: displayName, username: username, profilePic: profilePic, caption: caption, date: date, audioFileName: soundFileName, waveform: nil))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 }

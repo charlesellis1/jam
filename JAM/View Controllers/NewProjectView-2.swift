@@ -127,13 +127,13 @@ class NewProjectView2: UIViewController, UIPickerViewDataSource, UIPickerViewDel
             presentAlertViewController(title: "Alert", message: "Caption is empty, do you still want to proceed?")
         }
         else {
-            feed.addPost(post: Post(displayName: feed.displayName, profilePic: feed.profilePic!, caption: captionTextField.text!, date: Date(), audioFileName: soundFileName, waveform: soundView))
+            feed.addPost(post: Post(displayName: feed.displayName, username: feed.username, profilePic: feed.profilePic!, caption: captionTextField.text!, date: Date(), audioFileName: soundFileName, waveform: soundView))
         }
         
         
         
         
-        //Congrats on making a post
+        print("Made a post!! 💦")
     }
     
     

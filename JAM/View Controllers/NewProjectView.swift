@@ -15,7 +15,7 @@ class NewProjectView: UIViewController {
     
     var audioPlayer = AVAudioPlayer()
     
-    var pathToSong: URL!
+    var pathToSong: URL?
     
     
     
@@ -41,19 +41,25 @@ class NewProjectView: UIViewController {
 
         
         
-        //Stuff for now / TEMPORARY
-        uploadedSongName.text = "couch-potato.mp3"
+        //Stuff
+        uploadedSongName.text = "No song to upload"
         
-        if uploadedSongName.text!.count < 1 {
-            
-            uploadStatus.isHidden = true
-            uploadActivityIndicator.isHidden = true
-            
-        }
-        else {
+        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        if let songPath = pathToSong {
+            uploadedSongName.text = "Success!"
             uploadStatus.isHidden = false
             uploadActivityIndicator.isHidden = false
         }
+        else {
+            uploadedSongName.text = ""
+            uploadStatus.isHidden = true
+            uploadActivityIndicator.isHidden = true
+        }
+        
     }
     
     
@@ -72,6 +78,16 @@ class NewProjectView: UIViewController {
         else {
             performSegue(withIdentifier: "toStepTwo", sender: Any.self)
         }
+        
+        
+    }
+    
+    
+    
+    @IBAction func unwindToNewProjectView(segue: UIStoryboardSegue) {
+        
+        
+        
         
         
     }

@@ -25,7 +25,7 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, UITableVi
     
     var supercolor: UIColor!
     
-    var pathOfSongToExport: URL!
+    var pathOfSongToExport: URL?
     
     @IBOutlet weak var timeLabel: UILabel!
     
@@ -45,7 +45,6 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, UITableVi
     var counter = 0.0
     var timer = Timer()
     var outerView: UIView!
-        
     
     
     
@@ -245,14 +244,17 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, UITableVi
         pathOfSongToExport = getDirectory().appendingPathComponent("\(indexPath.row + 1).m4a")
         
         
-        print("Selected this song:", String(pathOfSongToExport.absoluteString))
+        print("Selected this song:", String(pathOfSongToExport!.absoluteString))
         
         
-        performSegue(withIdentifier: "unwind", sender: Any.self)
+        performSegue(withIdentifier: "finishedRecording", sender: self)
+        
         
         //FIXME: unwind back to navigation controller
 //        navigationController?.unwind(for: <#T##UIStoryboardSegue#>, towards: NewProjectView.init())
+        
     }
+    
     
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -260,6 +262,18 @@ class RecordViewController: UIViewController, AVAudioRecorderDelegate, UITableVi
             //delete from directory and delete from table view
             deleteRecording(index: indexPath.row)
             recordingsTableView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
+    
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "finishedRecording" {
+            if let dest = segue.destination as? NewProjectView {
+                if let path = pathOfSongToExport {
+                    dest.pathToSong = path
+                }
+            }
         }
     }
     

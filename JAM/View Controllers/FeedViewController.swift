@@ -41,6 +41,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
         postTableView.separatorColor = .black
         
         
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -98,6 +99,15 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             else {
                 cell.soundwaveView.meteringLevels = cell.placeholdMeteringLevels
             }
+            
+            
+            
+            
+            //Update to firestore. I want to have it here instead of in addPost method in FeedData,
+            // so I can check if first two posts are added properly
+            
+            feed.updatePostToFirestore(post: Post(displayName: currentPost.displayName, username: currentPost.username, profilePic: currentPost.profilePic, caption: currentPost.caption, date: currentPost.date, audioFileName: currentPost.audioFileName, waveform: nil))
+            
             
             return cell
         }
