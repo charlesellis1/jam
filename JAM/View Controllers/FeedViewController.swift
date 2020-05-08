@@ -66,7 +66,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             cell.captionLabel.text = currentPost.caption
             cell.dateLabel.text = formatDate(date: currentPost.date)
             cell.profileImage.image = currentPost.profilePic
-            
+            cell.isURL = currentPost.isURL
             
             //Add song
             cell.soundFileName = currentPost.audioFileName
@@ -90,15 +90,32 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
 //            }
             
             
+//            if let audio = cell.soundFileName {
+//                if let meteringLevels = cell.getMeteringLevels(song: audio) {
+//                    cell.setupSoundViewWithMeteringLevels(soundView: cell.soundwaveView, meteringLevels: meteringLevels)
+//                }
+//                if let audioURL = URL(fileURLWithPath: cell.soundFileName) {
+//                    let meteringLevels = feed.getMeteringLevels(url: audioURL)
+//                    cell.setupSoundViewWithMeteringLevels(soundView: cell.soundwaveView, meteringLevels: meteringLevels)
+//                }
+//            }
             
-            if cell.soundFileName!.count > 0 {
-                let meteringLevels = cell.getMeteringLevels(song: cell.soundFileName!)
-                
-                cell.setupSoundViewWithMeteringLevels(soundView: cell.soundwaveView, meteringLevels: meteringLevels)
+            
+    
+            
+            if let song = cell.soundFileName {
+                if currentPost.isURL {
+                    let songURL = URL(string: song)
+                    let meteringLevels = feed.getMeteringLevels(url: songURL!)
+                    cell.setupSoundViewWithMeteringLevels(soundView: cell.soundwaveView, meteringLevels: meteringLevels)
+                }
+                else {
+                    let meteringLevels = cell.getMeteringLevels(song: cell.soundFileName!)
+                    cell.setupSoundViewWithMeteringLevels(soundView: cell.soundwaveView, meteringLevels: meteringLevels)
+                }
             }
-            else {
-                cell.soundwaveView.meteringLevels = cell.placeholdMeteringLevels
-            }
+            
+            
             
             
             
@@ -106,7 +123,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
             //Update to firestore. I want to have it here instead of in addPost method in FeedData,
             // so I can check if first two posts are added properly
             
-            feed.updatePostToFirestore(post: Post(displayName: currentPost.displayName, username: currentPost.username, profilePic: currentPost.profilePic, caption: currentPost.caption, date: currentPost.date, audioFileName: currentPost.audioFileName, waveform: nil))
+            feed.updatePostToFirestore(post: Post(displayName: currentPost.displayName, username: currentPost.username, profilePic: currentPost.profilePic, caption: currentPost.caption, date: currentPost.date, audioFileName: currentPost.audioFileName, waveform: nil, isURL: currentPost.isURL))
             
             
             return cell

@@ -23,6 +23,7 @@ struct Post {
     var date: Date
     var audioFileName: String
     var waveform: AudioVisualizationView?
+    var isURL: Bool
     
     
     
@@ -44,8 +45,8 @@ class FeedData {
     
     
     var posts: [Post] = [
-        Post(displayName: "Charlie Ellis", username: "@chellis11", profilePic: UIImage(named: "default_avatar")!, caption: "Yoooo", date: Date(), audioFileName: "polar-bowler-3.mp3", waveform: nil),
-        Post(displayName: "Nikhil Yerasi", username: "nyerasi", profilePic: UIImage(named: "default_avatar")!, caption: "In my feels 😷", date: Date(), audioFileName: "maria.mp3", waveform: nil)
+        Post(displayName: "Charlie Ellis", username: "@chellis11", profilePic: UIImage(named: "default_avatar")!, caption: "Yoooo", date: Date(), audioFileName: "polar-bowler-3.mp3", waveform: nil, isURL: false),
+        Post(displayName: "Nikhil Yerasi", username: "nyerasi", profilePic: UIImage(named: "default_avatar")!, caption: "In my feels 😷", date: Date(), audioFileName: "maria.mp3", waveform: nil, isURL: false)
     ]
     
     
@@ -111,6 +112,8 @@ class FeedData {
 
             //Read the frame from the audio file
             try! audioFile.read(into: audioBuffer, frameCount: AVAudioFrameCount(frameSizeToRead))
+            
+            
 
             //Get the data from the chosen channel
             let channelData = audioBuffer.floatChannelData![channelNumber]
@@ -148,6 +151,14 @@ class FeedData {
         return finalArray
     }
     
+    func getMeteringLevels(url: URL) -> [Float] {
+        var finalArray: [Float] = [Float]()
+        averagePowers(audioFileURL: url, forChannel: 0, completionHandler: {array in
+            finalArray = array
+        })
+        return finalArray
+    }
+    
     
     
     func setupSoundViewWithMeteringLevels(soundView: AudioVisualizationView, meteringLevels: [Float]) {
@@ -181,6 +192,8 @@ class FeedData {
         //firebase can play sound? or na ****
         let dbSound = post.audioFileName
         
+        let dbIsURL = post.isURL
+        
         
         
         //Storage reference
@@ -190,9 +203,17 @@ class FeedData {
         
         
         //Will this Work??? vvvv
-        let dbAudio = Bundle.main.path(forResource: dbSound, ofType: nil)
+        var dbAudio: String?
+        var soundURL: URL?
+        if dbIsURL {
+            dbAudio = dbSound
+            soundURL = URL(string: dbAudio!)
+        }
+        else {
+            dbAudio = Bundle.main.path(forResource: dbSound, ofType: nil)
+            soundURL = URL(fileURLWithPath: dbAudio!)
+        }
         
-        let soundURL = URL(fileURLWithPath: dbAudio!)
         
 //        var dbAudioPlayer: AVAudioPlayer?
 //
@@ -205,7 +226,7 @@ class FeedData {
         
         let uploadMetaData = StorageMetadata.init()
         uploadMetaData.contentType = "audio"
-        storageRef.putFile(from: soundURL)
+        storageRef.putFile(from: soundURL!)
         
         
         
@@ -228,7 +249,8 @@ class FeedData {
             "profilePic": dbProfilePic,
             "date": dbDate,
             "caption": dbCaption,
-            "soundFileName": dbSound
+            "soundFileName": dbSound,
+            "isURL": dbIsURL
         ]) {err in
             if let err = err {
                 print("Error adding document: \(err)")
@@ -257,16 +279,18 @@ class FeedData {
                 var date: Date
                 var caption: String
                 var soundFileName: String
+                var isURL: Bool
                 
                 for document in querySnapshot!.documents {
                     postID = document.data()["postID"] as! String
                     displayName = document.data()["displayName"] as! String
                     username = document.data()["username"] as! String
                     let profilePicData = document.data()["profilePic"] as! Data
-                    profilePic = UIImage(data: profilePicData) ?? UIImage(named: "default_avatar") as! UIImage
+                    profilePic = UIImage(data: profilePicData) ?? UIImage(named: "default_avatar")!
                     caption = document.data()["caption"] as! String
                     date = document.data()["date"] as! Date
                     soundFileName = document.data()["soundFileName"] as! String
+                    isURL = document.data()["isURL"] as! Bool
                     
                     
                     
@@ -278,7 +302,7 @@ class FeedData {
                         }
                         if let data = data {
                             
-                            self.posts.append(Post(displayName: displayName, username: username, profilePic: profilePic, caption: caption, date: date, audioFileName: soundFileName, waveform: nil))
+                            self.posts.append(Post(displayName: displayName, username: username, profilePic: profilePic, caption: caption, date: date, audioFileName: soundFileName, waveform: nil, isURL: isURL))
                         }
                     }
                 }
@@ -290,6 +314,16 @@ class FeedData {
     
     
     
+    
+//    func presentAlertViewController(title: String, message: String) {
+//        let currentVC =
+//        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+//        let action = UIAlertAction(title: "OK", style: .default) { (action) in
+//            self.dismiss(animated: true, completion: nil)
+//        }
+//        alertController.addAction(action)
+//        present(alertController, animated: true, completion: nil)
+//    }
     
     
     

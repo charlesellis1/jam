@@ -26,6 +26,8 @@ class PostTableViewCell: UITableViewCell {
     
     var soundFileName: String? = ""
     
+    var isURL: Bool?
+    
     let placeholdMeteringLevels: [Float] = [Float]()
     
     
@@ -48,14 +50,26 @@ class PostTableViewCell: UITableViewCell {
             sender.setBackgroundImage(UIImage(systemName: "play.fill"), for: .normal)
         }
         else {
-            let sound = Bundle.main.path(forResource: soundFileName, ofType: nil)
+            if !isURL! {
+                let sound = Bundle.main.path(forResource: soundFileName, ofType: nil)
+                
+                do {
+                    audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: sound!))
+                }
+                catch {
+                    print("Error playing sound or acquiring sound")
+                }
+            }
+            else {
+                let url = URL(string: soundFileName!)
+                do {
+                    audioPlayer = try AVAudioPlayer(contentsOf: url!)
+                }
+                catch {
+                    print("Error playing sound or acquiring sound")
+                }
+            }
             
-            do {
-                audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: sound!))
-            }
-            catch {
-                print("Error playing sound or acquiring sound")
-            }
             audioPlayer.play()
             sender.setBackgroundImage(UIImage(systemName: "pause.fill"), for: .normal)
         }

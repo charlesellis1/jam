@@ -20,7 +20,7 @@ class NewProjectView2: UIViewController, UIPickerViewDataSource, UIPickerViewDel
     
     let placeholdMeteringLevels: [Float] = [0.3, 0.6, 0.9, 0.6, 0.3, 0.1, 0.1, 0.3, 0.6, 0.9, 0.95, 0.9, 0.6, 0.3, 0.6, 0.9, 0.6, 0.3, 0.1, 0.1, 0.3, 0.6, 0.9, 0.95, 0.9, 0.6, 0.2, 0.1, 0.4, 0.45, 0.5, 0.6, 0.8, 0.95, 0.8, 0.5, 0.3, 0.6, 0.9, 0.6, 0.3, 0.1, 0.1, 0.3, 0.6, 0.9, 0.95, 0.9, 0.6, 0.3, 0.6, 0.9, 0.6, 0.3, 0.1, 0.1, 0.3, 0.6, 0.9, 0.95, 0.9, 0.6, 0.2, 0.1, 0.4, 0.45, 0.5, 0.6, 0.8, 0.95, 0.8, 0.5]
     
-    var soundFileName: String!
+    var soundFileURL: URL?
     
     
     
@@ -65,14 +65,16 @@ class NewProjectView2: UIViewController, UIPickerViewDataSource, UIPickerViewDel
         
         soundView.audioVisualizationMode = .write
         
-        if soundFileName!.count > 0 {
-            let meteringLevels = feed.getMeteringLevels(song: soundFileName!)
-            
+        
+        
+        if let songURL = soundFileURL {
+            let meteringLevels = feed.getMeteringLevels(url: songURL)
             feed.setupSoundViewWithMeteringLevels(soundView: soundView, meteringLevels: meteringLevels)
         }
         else {
             soundView.meteringLevels = placeholdMeteringLevels
         }
+        
         
         
         
@@ -96,10 +98,9 @@ class NewProjectView2: UIViewController, UIPickerViewDataSource, UIPickerViewDel
             sender.setBackgroundImage(UIImage(systemName: "play.fill"), for: .normal)
         }
         else {
-            let sound = Bundle.main.path(forResource: soundFileName, ofType: nil)
             
             do {
-                audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: sound!))
+                audioPlayer = try AVAudioPlayer(contentsOf: soundFileURL!)
             }
             catch {
                 print("Error playing sound or acquiring sound")
@@ -118,22 +119,34 @@ class NewProjectView2: UIViewController, UIPickerViewDataSource, UIPickerViewDel
     @IBAction func postButtonPressed(_ sender: Any) {
         
 
-        //Throw alerts if inputs are bad
-        if soundFileName.count < 1 {
-            presentAlertViewController(title: "Alert!", message: "Go back and add a song.")
-        }
+        var error = false
+        var soundFileName: String?
         
-        else if captionTextField.text!.count < 1 {
-            presentAlertViewController(title: "Alert", message: "Caption is empty, do you still want to proceed?")
+        //Throw alerts if inputs are bad
+        if let songURL = soundFileURL {
+            soundFileName = songURL.absoluteString
         }
         else {
-            feed.addPost(post: Post(displayName: feed.displayName, username: feed.username, profilePic: feed.profilePic!, caption: captionTextField.text!, date: Date(), audioFileName: soundFileName, waveform: soundView))
+            error = true
+            presentAlertViewController(title: "Alert", message: "Please add a song.")
         }
         
+        if let captionText = captionTextField.text {
+        }
+        else {
+            error = true
+            presentAlertViewController(title: "Alert", message: "Please enter a caption in order to make a valid post.")
+        }
         
+        if !error {
+            feed.addPost(post: Post(displayName: feed.displayName, username: feed.username, profilePic: feed.profilePic!, caption: captionTextField.text!, date: Date(), audioFileName: soundFileName!, waveform: soundView, isURL: true))
+        }
         
         
         print("Made a post!! 💦")
+        
+        navigationController?.popToRootViewController(animated: true)
+        presentAlertViewController(title: "Congrats!", message: "You made a post! Go check your feed!")
     }
     
     

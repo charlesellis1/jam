@@ -43,6 +43,8 @@ class NewProjectView: UIViewController {
         
         //Stuff
         uploadedSongName.text = "No song to upload"
+        uploadStatus.isHidden = true
+        uploadActivityIndicator.isHidden = true
         
         
     }
@@ -95,7 +97,7 @@ class NewProjectView: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toStepTwo" {
             if let dest = segue.destination as? NewProjectView2 {
-                dest.soundFileName = uploadedSongName.text
+                dest.soundFileURL = pathToSong
             }
         }
     }

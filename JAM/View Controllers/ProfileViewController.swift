@@ -40,6 +40,10 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         print(myPosts)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        profileTableView.reloadData()
+    }
+    
     
     @IBAction func postsButtonPressed(_ sender: Any) {
         
